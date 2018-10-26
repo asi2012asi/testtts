@@ -1,0 +1,120 @@
+apply plugin: 'com.android.application'
+
+
+def getConfigProperty(String property) {
+    def configFile = file('../../personal_config.properties')
+    if (configFile.canRead()) {
+        def Properties configProps = new Properties();
+        configProps.load(new FileInputStream(configFile))
+        def value = configProps[property]
+        return value
+    } else {
+        throw new GradleException("Could not find personal_config.properties!")
+    }
+}
+
+android {
+    compileSdkVersion 23
+    buildToolsVersion "25.0.2"
+
+    //下面下面方法，签名逻辑
+    signingConfigs {
+        debug {
+            try {
+                storeFile file(getConfigProperty('STORE_FILE'))
+                storePassword KEYSTORE_PASSWORD
+                keyAlias "androiddebugkey"
+                keyPassword KEY_PASSWORD
+            } catch (ex) {
+                throw new InvalidUserDataException("You should define KEYSTORE_PASSWORD and KEY_PASSWORD in gradle.properties.")
+            }
+        }
+
+        release {
+            try {
+                storeFile file(getConfigProperty('STORE_FILE'))
+                storePassword KEYSTORE_PASSWORD
+                keyAlias "androiddebugkey"
+                keyPassword KEY_PASSWORD
+            } catch (ex) {
+                throw new InvalidUserDataException("You should define KEYSTORE_PASSWORD and KEY_PASSWORD in gradle.properties.")
+            }
+        }
+    }
+
+    defaultConfig {
+        applicationId "com.xiaopeng.testtts.testttsapp"
+        minSdkVersion 19
+        targetSdkVersion 23
+        versionCode 1
+        versionName "1.0"
+        testInstrumentationRunner "android.support.test.runner.AndroidJUnitRunner"
+    }
+    buildTypes {
+
+        debug {
+            buildConfigField "boolean", "LOG_DEBUG", "true"
+            versionNameSuffix "_dev"
+            minifyEnabled false
+            zipAlignEnabled true
+            shrinkResources false
+            signingConfig signingConfigs.debug
+        }
+
+        release {
+            buildConfigField "boolean", "LOG_DEBUG", "false"
+            minifyEnabled false
+            zipAlignEnabled true
+            shrinkResources false
+            proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
+            signingConfig signingConfigs.release
+
+            //多渠道打包将此注释打开即可
+
+            applicationVariants.all { variant ->
+                gi
+                variant.outputs.each { output ->
+                    def outputFile = output.outputFile
+                    if (outputFile != null && outputFile.name.endsWith('.apk')) {
+                        // 输出apk名称为ttwg_v1.0_2015-01-15-12:00_wandoujia.apk
+                        //def fileName = "xp_ChargeControl_${defaultConfig.versionName}_${releaseTime()}.apk"
+                        def fileName = "nobody_test.apk"
+                        output.outputFile = new File(outputFile.parent, fileName)
+                    }
+                }
+            }
+        }
+    }
+
+    allprojects {
+        gradle.projectsEvaluated {
+            tasks.withType(JavaCompile) {
+                options.compilerArgs << "-Xlint:unchecked" << "-Xlint:deprecation"
+            }
+        }
+    }
+
+    lintOptions {
+        abortOnError false
+    }
+}
+
+dependencies {
+    compile fileTree(include: ['*.jar'], dir: 'libs')
+//    compile fileTree(include: ['*.aar'], dir: 'libs')
+    compile(name:'lib_speech_protocol-release', ext:'aar')
+    compile fileTree(dir: 'libs', include: ['*.jar'])
+    androidTestCompile('com.android.support.test.espresso:espresso-core:2.2.2', {
+        exclude group: 'com.android.support', module: 'support-annotations'
+    })
+    compile 'com.android.support:appcompat-v7:23.+'
+    compile 'com.android.support.constraint:constraint-layout:1.0.2'
+    testCompile 'junit:junit:4.12'
+}
+
+repositories {
+    mavenCentral()
+    flatDir{
+        dirs 'libs'
+    }
+}
