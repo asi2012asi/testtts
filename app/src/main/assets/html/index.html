@@ -1,0 +1,337 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0,minimum-scale=1.0,user-scalable=0" />
+    <title>NoBody必胜</title>
+    <link rel="stylesheet" href="./assets/animate.css">
+    <style>
+        *{
+            margin:0;
+            padding:0;
+            box-sizing: border-box;
+        }
+        li{
+            list-style:none;
+        }
+        img{
+            vertical-align:top;
+            border:none;
+        }
+        .bg {
+            position: fixed;
+            width: 100%;
+            height: 100%;
+            background-image: url('./assets/背景.png');
+            background-position: center;
+            background-size: cover;
+            background-repeat: no-repeat;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        #wrap {
+            position: relative;
+            overflow: hidden;
+        }
+        .robot_bg {
+            width: 6.166667rem;
+            height: 4.157407rem;
+            background-image: url('./assets/阴影.png');
+            background-position: center;
+            background-size: cover;
+            background-repeat: no-repeat;
+            position: relative;
+        }
+        .robot {
+            margin: 0 auto;
+            width: 5rem;
+            height: 3.277778rem;
+        }
+
+        .status {
+            position: absolute;
+            width: 100%;
+            left: 0;
+            top: 0;
+            bottom: 0;
+            margin: auto 0;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            z-index: 101;
+        }
+
+        .statusImg {
+            margin-top: -30px;
+            display: none;
+        }
+
+        #status_normal {
+            margin-top: -0.833333rem;
+            width: 2.037037rem;
+            height: 1.324074rem;
+        }
+
+        #status_waiting {
+            margin-top: -.8rem;
+            width: 2.111111rem;
+            height: 2.111111rem;
+        }
+        #status_fail {
+            width: 1.648148rem;
+            height: 1.648148rem;
+            margin-top: -.8rem;
+        }
+        #status_success {
+            margin-top: -.8rem;
+            width: 1.87963rem;
+            height: 1.324074rem;
+        }
+        #speak_bg {
+            position: absolute;
+            left: -0.62963rem;
+            top: -2.740741rem;
+            background-image: url('./assets/气泡.png');
+            background-position: center;
+            background-size: 4.407407rem 2.425926rem;
+            background-repeat: no-repeat;
+            width: 4.407407rem;
+            height: 2.425926rem;
+            display: flex;
+            align-items: flex-start;
+            justify-content: center;
+        }
+        @font-face {
+            font-family: 'mini';
+            src: local('./assets/mini.ttf');
+            font-weight: bold;
+        }
+        #text {
+            margin-top: .481481rem;
+            color: #FFF;
+            font-size: .722222rem;
+            font-family: 'mini';
+        }
+
+        #success_bg {
+            position: absolute;
+            left: -1.111111rem;
+            top: -2.75rem;
+            z-index: 99;
+        }
+
+        #success_img {
+            width: 7.87963rem;
+            height: 8.787037rem;
+        }
+
+        .rotate {
+            -webkit-transition-property: -webkit-transform;
+            -webkit-transition-duration: 1s;
+            -moz-transition-property: -moz-transform;
+            -moz-transition-duration: 1s;
+            -webkit-animation: rotate 6s linear infinite;
+            -moz-animation: rotate 6s linear infinite;
+            -o-animation: rotate 6s linear infinite;
+            animation: rotate 6s linear infinite;
+        }
+
+        #robot_img {
+            position: absolute;
+            left: .583333rem;
+            top: 0;
+            width: 5rem;
+            height: 3.277778rem;
+            z-index: 100;
+
+        }
+        @-webkit-keyframes rotate{
+            from{-webkit-transform: rotate(0deg)}
+            to{-webkit-transform: rotate(360deg)}
+        }
+        @-moz-keyframes rotate{from{-moz-transform: rotate(0deg)}
+            to{-moz-transform: rotate(359deg)}
+        }
+        @-o-keyframes rotate{from{-o-transform: rotate(0deg)}
+            to{-o-transform: rotate(359deg)}
+        }
+        @keyframes rotate{from{transform: rotate(0deg)}
+            to{transform: rotate(359deg)}
+        }
+    </style>
+</head>
+<body>
+    <script type="text/javascript">
+        var windowWidth = document.body.clientWidth;
+        var fontSize = windowWidth / 10;
+        // 设置html font-size 的样式
+        var style = document.createElement('style');
+        style.type = 'text/css';
+        style.innerHTML = 'html { font-size: '+ fontSize +'px !important;}';
+        document.head.appendChild(style);
+    </script>
+    <div class="bg">
+        <div class="robot_bg">
+            <div class="robot" id="robot">
+                <div class="status" id="status">
+                    <img id="status_normal" style="display: block;" class="statusImg" src="./assets/默认.png">
+                    <img id="status_waiting" class="statusImg" src="./assets/等待.png">
+                    <img id="status_success" class="statusImg" src="./assets/成功.png">
+                    <img id="status_fail" class="statusImg" src="./assets/失败.png">
+                </div>
+                <div id="speak_bg" style="display:none;">
+                    <p id="text">一石二鸟</p>
+                </div>
+                <div id="success_bg" style="display:none;">
+                    <img src="./assets/光.png" id="success_img">
+                </div>
+                <img id="robot_img" src="./assets/本体.png">
+            </div>
+        </div>
+    </div>
+    <script src="./assets/jq.js"></script>
+    <script>
+        $(function() {
+            window.direction = 'left';
+            window.shouldStop = false;
+            setStatusToBoring();
+        });
+        
+        function setStatusToFail() {
+            setNodeToNormal();
+            $('#status_fail').fadeIn(100);
+            $('#robot_img').addClass('animated shake');
+            $('#status_fail').addClass('animated shake');
+        }
+
+        function setStatusToNormal() {
+            setNodeToNormal();
+            $('#status_normal').fadeIn(100);
+            $('#speak_bg').hide();
+        }
+
+        function setStatusToBoring() {
+            setStatusToNormal();
+            window.shouldStop = false;
+            $('#text').html("谁来陪我玩?");
+            $('#speak_bg').show();
+            var seeLeft = function(callback) {
+                $('#robot_img').animate({
+                    left: '.5333rem',
+                }, 'slow', callback);
+                $('.status').animate({
+                    left: '-.2rem',
+                }, 'slow');
+            };
+            var seeRight = function(callback) {
+                $('#robot_img').animate({
+                    left: '.63888rem',
+                }, 'slow', callback);
+                $('.status').animate({
+                    left: '.2333rem',
+                }, 'slow');
+            }
+            var lookFunc = function() {
+                if (window.shouldStop) {
+                    $('#robot_img').animate({
+                    left: '.583333rem',
+                    }, 'slow');
+                    $('.status').animate({
+                        left: '0rem',
+                    }, 'slow');
+                    return;
+                }
+                if (window.direction === 'left') window.direction = 'right';
+                else window.direction = 'left';
+                if (window.direction === 'left') {
+                    seeLeft(lookFunc);
+                } else {
+                    seeRight(lookFunc);
+                }
+            }
+            lookFunc();
+        }
+
+        function setStatusToWaiting() {
+            setNodeToNormal();
+            $('#status_waiting').fadeIn(100);
+            $('#text').html(".(啥?)");
+            window.pointCount = 1;
+
+            window.watingInterval = setInterval(function() {
+                var nextPointCount = window.pointCount + 1;
+                if (nextPointCount > 6) {
+                    window.pointCount = 0;
+                    nextPointCount = 1;
+                }
+                var content = "";
+                for (var i = 0; i < nextPointCount; i += 1) {
+                    content += '.';
+                }
+                $('#text').html(content + "(啥?)");
+                window.pointCount += 1;
+            }, 300);
+            $('#speak_bg').show();
+        }
+
+        function setStatusToSuccess() {
+            setNodeToNormal();
+            $('#success_bg').fadeIn(100);
+            $('#success_bg').addClass('rotate');
+            $('#status_success').fadeIn(1000);
+        }
+
+        function setStatusToSpeak(speakContent) {
+            $('#text').html(speakContent);
+            setNodeToNormal();
+            window.shouldEyeStop = false;
+            $('#status_normal').fadeIn(100);
+            var setHeightToZero = function(callback) {
+                $('#status_normal').animate({
+                    height: '0.6rem',
+                }, 600, callback);
+            };
+            var setHeightToFull = function(callback) {
+                $('#status_normal').animate({
+                    height: '1.324074rem',
+                }, 600, callback);
+            };
+            var eyesFunc = function() {
+                if (window.shouldEyeStop) {
+                    setHeightToFull();
+                    return;
+                }
+                if (window.eyeHeight === 'full') window.eyeHeight = 'zero';
+                else window.eyeHeight = 'full';
+                if (window.eyeHeight === 'zero') {
+                    setHeightToFull(eyesFunc);
+                } else {
+                    setHeightToZero(eyesFunc);
+                }
+            }
+            eyesFunc();
+            $('#speak_bg').show();
+        }
+
+        function setNodeToNormal() {
+            window.shouldStop = true;
+            window.shouldEyeStop = true;
+            window.eyeHeight = 'zero';
+            $('#robot_img').removeClass('animated');
+            $('#robot_img').removeClass('shake');
+            $('#status_fail').removeClass('animated');
+            $('#status_fail').removeClass('shake');
+            $('#status_normal').removeClass('animated');
+            $('#status_normal').removeClass('flash');
+            $('#status_normal').removeClass('infinite');
+            $('#success_bg').hide();
+            $('.statusImg').hide();
+            $('#speak_bg').hide();
+            clearInterval(window.watingInterval);
+        }
+    </script>
+</body>
+</html>

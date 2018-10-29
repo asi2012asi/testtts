@@ -11,9 +11,12 @@ import com.xiaopeng.speech.SpeechClient;
 
 public class AIApplication extends Application {
 
+    private static AIApplication sInstance;
+
     @Override
     public void onCreate() {
         super.onCreate();
+        sInstance = this;
         initSpeech();
     }
 
@@ -23,5 +26,9 @@ public class AIApplication extends Application {
     private void initSpeech() {
         SpeechClient.instance().init(this);
         SpeechClient.instance().setAppName("tts");
+    }
+
+    public static AIApplication getInstance() {
+        return sInstance;
     }
 }

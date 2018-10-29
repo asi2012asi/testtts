@@ -17,30 +17,30 @@ android {
     compileSdkVersion 23
     buildToolsVersion "25.0.2"
 
-    //下面下面方法，签名逻辑
-    signingConfigs {
-        debug {
-            try {
-                storeFile file(getConfigProperty('STORE_FILE'))
-                storePassword KEYSTORE_PASSWORD
-                keyAlias "androiddebugkey"
-                keyPassword KEY_PASSWORD
-            } catch (ex) {
-                throw new InvalidUserDataException("You should define KEYSTORE_PASSWORD and KEY_PASSWORD in gradle.properties.")
-            }
-        }
-
-        release {
-            try {
-                storeFile file(getConfigProperty('STORE_FILE'))
-                storePassword KEYSTORE_PASSWORD
-                keyAlias "androiddebugkey"
-                keyPassword KEY_PASSWORD
-            } catch (ex) {
-                throw new InvalidUserDataException("You should define KEYSTORE_PASSWORD and KEY_PASSWORD in gradle.properties.")
-            }
-        }
-    }
+//    //下面下面方法，签名逻辑
+//    signingConfigs {
+//        debug {
+//            try {
+//                storeFile file(getConfigProperty('STORE_FILE'))
+//                storePassword KEYSTORE_PASSWORD
+//                keyAlias "androiddebugkey"
+//                keyPassword KEY_PASSWORD
+//            } catch (ex) {
+//                throw new InvalidUserDataException("You should define KEYSTORE_PASSWORD and KEY_PASSWORD in gradle.properties.")
+//            }
+//        }
+//
+//        release {
+//            try {
+//                storeFile file(getConfigProperty('STORE_FILE'))
+//                storePassword KEYSTORE_PASSWORD
+//                keyAlias "androiddebugkey"
+//                keyPassword KEY_PASSWORD
+//            } catch (ex) {
+//                throw new InvalidUserDataException("You should define KEYSTORE_PASSWORD and KEY_PASSWORD in gradle.properties.")
+//            }
+//        }
+//    }
 
     defaultConfig {
         applicationId "com.xiaopeng.testtts.testttsapp"
@@ -67,7 +67,7 @@ android {
             zipAlignEnabled true
             shrinkResources false
             proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
-            signingConfig signingConfigs.release
+//            signingConfig signingConfigs.release
 
             //多渠道打包将此注释打开即可
 
@@ -107,6 +107,8 @@ dependencies {
     androidTestCompile('com.android.support.test.espresso:espresso-core:2.2.2', {
         exclude group: 'com.android.support', module: 'support-annotations'
     })
+    compile 'com.koushikdutta.async:androidasync:2.+'
+    compile 'com.neovisionaries:nv-websocket-client:2.6'
     compile 'com.android.support:appcompat-v7:23.+'
     compile 'com.android.support.constraint:constraint-layout:1.0.2'
     testCompile 'junit:junit:4.12'
